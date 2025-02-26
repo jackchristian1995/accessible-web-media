@@ -3,7 +3,7 @@
     <label for="files">
       Drop your media files below to get your accessibility features.
     </label>
-    <input class="appearance-none block" type="file" multiple name="files" id="files" accept="image/*, audio/mpeg, audio/ogg, video/mp4, video/ogg" @change.prevent="sendMedia" />
+    <input class="appearance-none block" type="file" multiple name="files" id="files" :accept="accept" @change.prevent="sendMedia" />
   </form>
 </template>
 
@@ -13,6 +13,14 @@ import { ref } from 'vue';
 
 // Component Imports
 import { Loader2 } from 'lucide-vue-next';
+
+// Props
+const props = defineProps({
+  accept: {
+    type: String,
+    required: true
+  }
+});
 
 // Form action
 const formRef = ref(null);
