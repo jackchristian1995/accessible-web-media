@@ -1,11 +1,10 @@
 <template>
-  <div>
-    <h1>Image Alt Text Generator</h1>
-    <generator-form accept="image/*" />
+  <div class="w-full">
+    <generator-controller media-type="image" loading-message="Generating alt text..." />
   </div>
 </template>
 
 <script setup>
 // Component Imports
-import GeneratorForm from '~/components/generator/GeneratorForm.vue';
+import GeneratorController from '~/components/generator/GeneratorController.vue';
 </script>
