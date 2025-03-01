@@ -21,8 +21,13 @@
     <div class="w-full h-full flex flex-col items-start justify-center">
       <nuxt-page />
     </div>
+    <Toaster />
   </div>
 </template>
+
+<script setup>
+import Toaster from '~/components/ui/toast/Toaster.vue';
+</script>
 
 <style scoped>
 nav.w-full {

@@ -15,7 +15,8 @@ export default defineEventHandler(async (event) => {
   const { result, error } = await deepgram.listen.prerecorded.transcribeFile(audioBuffer, {
     model: "nova-3",
     smart_format: true,
-    utterances: true
+    utterances: true,
+    multichannel: true
   });
   if (error) throw createError({ statusMessage: error.message });
 
@@ -25,7 +26,9 @@ export default defineEventHandler(async (event) => {
   const { data, error: srtError } = await supabase.storage.from('transcripts').upload(`${Date.now()}-${audio.name}.srt`, transcript, { contentType: 'text/srt' });
   if (srtError) throw createError({ statusMessage: srtError.message });
   
-  const { data: { signedUrl: downloadUrl }, error: downloadError } = await supabase.storage.from('transcripts').createSignedUrl(data.path, 60);
+  const { data: { signedUrl: downloadUrl }, error: downloadError } = await supabase.storage.from('transcripts').createSignedUrl(data.path, 60, {
+    download: true
+  });
   
   if (downloadError) throw createError({ statusMessage: downloadError.message });
 

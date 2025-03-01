@@ -1,11 +1,10 @@
 <template>
-  <div>
-    <h1>Audio Transcript Generator</h1>
-    <generator-form accept="audio/*" />
+  <div class="w-full">
+    <generator-controller media-type="audio" loading-message="Transcribing your audio..." />
   </div>
 </template>
 
 <script setup>
 // Component Imports
-import GeneratorForm from '~/components/generator/GeneratorForm.vue';
+import GeneratorController from '~/components/generator/GeneratorController.vue';
 </script>

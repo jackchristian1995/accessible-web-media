@@ -26,7 +26,9 @@ export default defineEventHandler(async (event) => {
 
   if (vttError) throw createError({ statusMessage: vttError.message });
 
-  const { data: { signedUrl: downloadUrl }, error: downloadError } = await supabase.storage.from('captions').createSignedUrl(data.path, 60);
+  const { data: { signedUrl: downloadUrl }, error: downloadError } = await supabase.storage.from('captions').createSignedUrl(data.path, 60 * 30, {
+    download: true,
+  });
   
   if (downloadError) throw createError({ statusMessage: downloadError.message });
 
