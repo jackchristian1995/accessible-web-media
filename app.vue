@@ -15,6 +15,9 @@
           <li>
             <nuxt-link to="/audio-transcription-generator">Transcribe Audio</nuxt-link>
           </li>
+          <li>
+            <button @click.prevent="signInWithGithub">Sign in with Github</button>
+          </li>
         </ul>
       </div>
     </nav>
@@ -26,7 +29,28 @@
 </template>
 
 <script setup>
+// Component Imports
 import Toaster from '~/components/ui/toast/Toaster.vue';
+
+// Login
+const signInWithGithub = async () => {
+  const url = await $fetch('/api/auth/signInGithub', { method: 'POST', body: { redirectUrl: window.location.href } });
+  window.location.href = url;  
+}
+
+// Auth Redirect Flow
+onMounted(async () => {
+  const { hash, path } = useRoute();
+  if (hash.includes('refresh_token')) {
+    window.history.pushState({}, null, path);
+    try {
+      await $fetch('/api/auth/getSessionFromHash', { method: 'POST', body: { hash } });
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+});
 </script>
 
 <style scoped>
