@@ -16,7 +16,35 @@
             <nuxt-link to="/audio-transcription-generator">Transcribe Audio</nuxt-link>
           </li>
           <li>
-            <button @click.prevent="signInWithGoogle">Sign in with Google</button>
+            <Dialog>
+              <DialogTrigger>
+                Sign in
+              </DialogTrigger>
+              <DialogContent class="text-gray-900">
+                <DialogHeader>
+                  <DialogTitle class="mb-2 text-xl">
+                    Sign into your account
+                  </DialogTitle>
+                  <DialogDescription class="text-gray-900">
+                    We currently offer two ways to sign in using either your Google or Github account.
+                  </DialogDescription>
+                </DialogHeader>
+                <DialogFooter class="flex sm:flex-col flex-col items-start space-y-4">
+                  <DialogClose as-child>
+                    <button class="cta !bg-gray-800 !hover:bg-gray-900 text-white text-lg flex flex-row justify-center items-center py-2 pl-4 pr-8 rounded-xl" @click.prevent="signInWithGithub">
+                      <img class="w-auto h-8 mr-4" src="/icons/github-mark-white.svg" alt="Github logo">
+                      <span>Sign in with Github</span>
+                    </button>
+                  </DialogClose>
+                  <DialogClose as-child>
+                    <button class="cta !bg-gray-800 !hover:bg-gray-900 text-white flex flex-row justify-center items-center py-2 pl-4 pr-8 rounded-xl" @click.prevent="signInGoogle">
+                      <img class="w-auto h-8 mr-4" src="/icons/web_dark_rd_na.svg" alt="Sign in with Google">
+                      <span>Sign in with Google</span>
+                    </button>
+                  </DialogClose>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           </li>
         </ul>
       </div>
@@ -31,6 +59,7 @@
 <script setup>
 // Component Imports
 import Toaster from '~/components/ui/toast/Toaster.vue';
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogFooter, DialogTitle, DialogDescription, DialogClose } from '~/components/ui/dialog';
 
 // Login
 const signInWithGithub = async () => {
