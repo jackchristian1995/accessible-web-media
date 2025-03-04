@@ -16,7 +16,7 @@
             <nuxt-link to="/audio-transcription-generator">Transcribe Audio</nuxt-link>
           </li>
           <li>
-            <button @click.prevent="signInWithGithub">Sign in with Github</button>
+            <button @click.prevent="signInWithGoogle">Sign in with Google</button>
           </li>
         </ul>
       </div>
@@ -35,6 +35,11 @@ import Toaster from '~/components/ui/toast/Toaster.vue';
 // Login
 const signInWithGithub = async () => {
   const url = await $fetch('/api/auth/signInGithub', { method: 'POST', body: { redirectUrl: window.location.href } });
+  window.location.href = url;  
+}
+
+const signInWithGoogle = async () => {
+  const url = await $fetch('/api/auth/signInGoogle', { method: 'POST', body: { redirectUrl: window.location.href } });
   window.location.href = url;  
 }
 
