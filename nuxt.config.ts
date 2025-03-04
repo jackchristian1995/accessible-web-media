@@ -4,7 +4,7 @@ export default defineNuxtConfig({
   devtools: { enabled: false },
   pages: true,
 
-  modules: ['@nuxtjs/tailwindcss'],
+  modules: ['@nuxtjs/tailwindcss', '@pinia/nuxt'],
 
   runtimeConfig: {
     replicateToken: '',

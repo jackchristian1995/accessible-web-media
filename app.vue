@@ -15,7 +15,7 @@
           <li>
             <nuxt-link to="/audio-transcription-generator">Transcribe Audio</nuxt-link>
           </li>
-          <li>
+          <li v-if="!user">
             <Dialog>
               <DialogTrigger>
                 Sign in
@@ -37,7 +37,7 @@
                     </button>
                   </DialogClose>
                   <DialogClose as-child>
-                    <button class="cta !bg-gray-800 !hover:bg-gray-900 text-white flex flex-row justify-center items-center py-2 pl-4 pr-8 rounded-xl" @click.prevent="signInGoogle">
+                    <button class="cta !bg-gray-800 !hover:bg-gray-900 text-white flex flex-row justify-center items-center py-2 pl-4 pr-8 rounded-xl" @click.prevent="signInWithGoogle">
                       <img class="w-auto h-8 mr-4" src="/icons/web_dark_rd_na.svg" alt="Sign in with Google">
                       <span>Sign in with Google</span>
                     </button>
@@ -45,6 +45,9 @@
                 </DialogFooter>
               </DialogContent>
             </Dialog>
+          </li>
+          <li v-else>
+            <button @click.prevent="logout">Logout</button>
           </li>
         </ul>
       </div>
@@ -72,13 +75,29 @@ const signInWithGoogle = async () => {
   window.location.href = url;  
 }
 
+// User
+import { useAuthStore } from '~/stores/AuthStore';
+const { getUser, setUser } = useAuthStore();
+
+const user = computed(() => getUser());
+
+const logout = async () => {
+  try {
+    await $fetch('/api/auth/logout');
+    setUser(undefined);
+  } catch (error) {
+    setUser(undefined);
+  }
+}
+
 // Auth Redirect Flow
 onMounted(async () => {
   const { hash, path } = useRoute();
   if (hash.includes('refresh_token')) {
     window.history.pushState({}, null, path);
     try {
-      await $fetch('/api/auth/getSessionFromHash', { method: 'POST', body: { hash } });
+      const userData = await $fetch('/api/auth/getSessionFromHash', { method: 'POST', body: { hash } });
+      setUser(userData);
     } catch (err) {
       console.error(err);
     }
