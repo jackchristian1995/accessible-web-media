@@ -6,6 +6,12 @@ export default defineEventHandler(async (event) => {
 
   if (body.length > 1) throw createError({ statusMessage: 'Only one file can be parsed at a time.' });
 
+  const authToken = getCookie(event, 'auth_token');
+  console.log(authToken);
+  
+  const { data: { user }, error: authError } = await supabase.auth.getUser(authToken);
+  if (authError) throw createError({ statusMessage: authError.message, statusCode: 401 });
+
   const video = body.get('media');
   const arrayBuffer = await video.arrayBuffer();
   const audioBuffer = Buffer.from(arrayBuffer);
@@ -20,9 +26,10 @@ export default defineEventHandler(async (event) => {
   if (error) throw createError({ statusMessage: error.message });
 
   const captions = webvtt(result);
+  const filename = video.name.split('.')[0];
 
   // Store transcript as a downloadable file
-  const { data, error: vttError } = await supabase.storage.from('captions').upload(`${Date.now()}-${video.name}.vtt`, captions, { contentType: 'text/vtt' });
+  const { data, error: vttError } = await supabase.storage.from('captions').upload(`${user.id}/${Date.now()}-${filename}.vtt`, captions, { contentType: 'text/vtt' });
 
   if (vttError) throw createError({ statusMessage: vttError.message });
 

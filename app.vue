@@ -31,14 +31,14 @@
                 </DialogHeader>
                 <DialogFooter class="flex sm:flex-col flex-col items-start space-y-4">
                   <DialogClose as-child>
-                    <button class="cta !bg-gray-800 !hover:bg-gray-900 text-white text-lg flex flex-row justify-center items-center py-2 pl-4 pr-8 rounded-xl" @click.prevent="signInWithGithub">
-                      <img class="w-auto h-8 mr-4" src="/icons/github-mark-white.svg" alt="Github logo">
+                    <button class="cta !bg-gray-800 !hover:bg-gray-900 text-white text-base flex flex-row justify-center items-center py-2 pl-4 pr-8 rounded-xl" @click.prevent="signInWithGithub">
+                      <img class="w-auto h-6 mr-2" src="/icons/github-mark-white.svg" alt="Github logo">
                       <span>Sign in with Github</span>
                     </button>
                   </DialogClose>
                   <DialogClose as-child>
-                    <button class="cta !bg-gray-800 !hover:bg-gray-900 text-white flex flex-row justify-center items-center py-2 pl-4 pr-8 rounded-xl" @click.prevent="signInWithGoogle">
-                      <img class="w-auto h-8 mr-4" src="/icons/web_dark_rd_na.svg" alt="Sign in with Google">
+                    <button class="cta !bg-gray-800 !hover:bg-gray-900 text-white flex text-base flex-row justify-center items-center py-2 pl-4 pr-8 rounded-xl" @click.prevent="signInWithGoogle">
+                      <img class="w-auto h-6 mr-2" src="/icons/web_dark_rd_na.svg" alt="Sign in with Google">
                       <span>Sign in with Google</span>
                     </button>
                   </DialogClose>

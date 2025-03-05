@@ -116,7 +116,7 @@ const handleDrop = async (e) => {
       }
     }
   } catch (err) {
-    error.value = err.message;
+    error.value = err.statusMessage;
 
     setTimeout(resetGenerator, 5000);
   }
