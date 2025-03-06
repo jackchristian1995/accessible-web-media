@@ -1,15 +1,16 @@
 <template>
   <div>
-    <section>
-      <h1 class="text-xl">{{ user.email }}</h1>
+    <file-list />
+    <section class="mt-16 py-16 border-t-2 border-red-500">
+      <h2 class="text-red-500 mb-8">Danger Area</h2>
       <Dialog>
-        <DialogTrigger class="cta">
+        <DialogTrigger class="cta border-red-500 text-red-500">
           Delete Account
         </DialogTrigger>
         <DialogContent>
           <DialogHeader>
             <DialogTitle class="text-red-600 font-bold text-2xl">
-              DANGER AREA
+              Are you sure?
             </DialogTitle>
             <DialogDescription>
               There is no going back once your account is deleted. All your files and data will be gone - FOREVER.
@@ -23,7 +24,6 @@
         </DialogContent>
       </Dialog>
     </section>
-    <file-list />
   </div>
 </template>
 

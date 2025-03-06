@@ -1,16 +1,17 @@
 <template>
   <div>
     <section>
-      <p v-if="error" class="font-bold text-red-500 py-4 text-center">
-        ERROR: {{ error }}
-      </p>
       <form ref="formRef" class="lg:w-2/3">
-        <label for="">
-          <h2 class="mb-4">Upload your files</h2>
+        <h2 class="mb-4">Upload your files</h2>
+        <label for="media">
           <p class="mb-4">Upload images, video and audio, then watch our generator create all the alternative media you need for your website.</p>
-          <p v-if="generating" class="mb-8">Be patient. If you're uploading a large video or audio file, it can take a few minutes to complete. Just remember, it's cheaper and quikcer than human doing it.</p>
-          <input class="border-b-2 border-white w-full" type="file" accept="image/jpeg, image/png, image/webp, image/gif, video/*, audio/*" name="media" :disabled="generating" multiple @change.prevent="parseFiles" />
+          <p v-if="!user" class="mb-4 font-bold">You must sign up to gain access to video captions and audio transcription.</p>
+          <p v-if="generating">Be patient. If you're uploading a large video or audio file, it can take a few minutes to complete. Just remember, it's cheaper and quikcer than human doing it.</p>
+          <input class="border-b-2 border-white w-full mt-8" id="media" type="file" accept="image/jpeg, image/png, image/webp, image/gif, video/*, audio/*" name="media" :disabled="generating" :multiple="user" @change.prevent="parseFiles" />
         </label>
+        <p v-if="error" class="font-bold text-red-500 py-4 text-left">
+          ERROR: {{ error }}
+        </p>
       </form>
       <table v-if="files.length" class="w-full mx-auto my-8 bg-white/5 rounded-2xl overflow-hidden border-collapse text-base lg:text-lg">
         <tbody>
@@ -45,7 +46,7 @@
 
 <script setup>
 // Module Imports
-import { ref } from 'vue';
+import { ref, inject } from 'vue';
 import { useToast } from '@/components/ui/toast/use-toast';
 
 // Component Imports
@@ -53,12 +54,14 @@ import { Loader2, Copy, Download } from 'lucide-vue-next';
 
 // Props
 const props = defineProps({
-  loadingMessage: {
-    type: String,
-    required: false,
-    default: 'Loading...'
+  user: {
+    type: [Object, undefined],
+    required: true
   }
 });
+
+// User
+const user = inject('user');
 
 // Error Handling
 const error = ref();
