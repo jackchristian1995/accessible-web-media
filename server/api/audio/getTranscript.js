@@ -8,7 +8,7 @@ export default defineEventHandler(async (event) => {
 
   const authToken = getCookie(event, 'auth_token');
   const { data: { user }, error: authError } = await supabase.auth.getUser(authToken);
-  if (authError) throw createError({ statusMessage: authError.message, statusCode: 401 });
+  if (authError) throw createError({ statusMessage: 'Sign up to gain access to audio transcription.', statusCode: 401 });
 
   const audio = body.get('media');
   const arrayBuffer = await audio.arrayBuffer();
@@ -25,7 +25,7 @@ export default defineEventHandler(async (event) => {
   if (error) throw createError({ statusMessage: error.message });
 
   const transcript = srt(result);
-  const filename = video.name.split('.')[0];
+  const filename = audio.name.split('.')[0];
 
   // Store transcript as a downloadable file
   const { data, error: srtError } = await supabase.storage.from('transcripts').upload(`${user.id}/${Date.now()}-${filename}.srt`, transcript, { contentType: 'text/srt' });

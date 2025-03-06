@@ -1,52 +1,44 @@
 <template>
-  <div class="w-full relative">
-    <section :class="['relative', { 'opacity-0': generating }]">
+  <div>
+    <section>
       <p v-if="error" class="font-bold text-red-500 py-4 text-center">
         ERROR: {{ error }}
       </p>
-      <div ref="dropAreaRef" id="drop-area" class="w-3/4 mx-auto h-[50vh] rounded-3xl border-2 border-white bg-white/5 relative" @drop.prevent="handleDrop" @dragover.prevent="handleDrag" @dragleave.prevent="handleDragExit">
-        <span class="block absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 font-bold md:text-lg select-none">
-          Drop your files here
-        </span>
-      </div>
-    </section>
-    <section v-if="generating" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full flex flex-col items-center justify-center">
-      <header v-if="completedFiles !== files.length" class="py-10">
-        <Loader2 class="w-8 h-8 block mx-auto mb-8 animate-spin" />
-        <p class="font-bold">{{ loadingMessage }}</p>
-      </header>
-      <header v-else class="py-10">
-        <h2 class="text-center mb-4">All done!</h2>
-        <p class="text-center">You’re files are ready to go. We recommend proofreading before using the results in production.</p>
-      </header>
-      <main class="flex flex-col items-center justify-start w-full xl:w-4/5">
-        <table class="w-full mx-auto bg-white/5 rounded-2xl overflow-hidden border-collapse">
-          <tbody>
-            <tr v-for="file of files" :key="file.data.filename" :class="{ 'border-b-2 border-white': files.length > 1 }">
-              <td class="py-5 px-6">
-                {{ file.data.name }}
-              </td>
-              <td class="py-5 px-6">
-                {{ file.status }}
-              </td>
-              <td v-if="mediaType === 'video' || mediaType === 'audio'" class="flex flex-row items-center justify-between space-x-4 py-5 px-6">
-                <a :class="['cta', { 'opacity-50 pointer-events-none': !file.result }]" :href="file.result" target="_blank" download>Download</a>
-              </td>
-              <td v-if="mediaType === 'image'" class="flex flex-row items-center justify-between space-x-4 py-5 px-6 w-full">
-                <span>
-                  {{ file.result }}
-                </span>
-                <button v-if="file.result" aria-label="Copy alt text" @click.prevent="addToClipboard(file.result)">
-                  <Copy class="w-6 h-6 ml-8" />
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        <button class="cta my-8 mx-auto" @click.prevent="resetGenerator">
-          Restart
-        </button>
-      </main>
+      <form ref="formRef" class="lg:w-2/3">
+        <label for="">
+          <h2 class="mb-4">Upload your files</h2>
+          <p class="mb-4">Upload images, video and audio, then watch our generator create all the alternative media you need for your website.</p>
+          <p v-if="generating" class="mb-8">Be patient. If you're uploading a large video or audio file, it can take a few minutes to complete. Just remember, it's cheaper and quikcer than human doing it.</p>
+          <input class="border-b-2 border-white w-full" type="file" accept="image/jpeg, image/png, image/webp, image/gif, video/*, audio/*" name="media" :disabled="generating" multiple @change.prevent="parseFiles" />
+        </label>
+      </form>
+      <table v-if="files.length" class="w-full mx-auto my-8 bg-white/5 rounded-2xl overflow-hidden border-collapse text-base lg:text-lg">
+        <tbody>
+          <tr v-for="file of files" :key="file.data.filename" :class="{ 'border-b-2 border-white': files.length > 1 }">
+            <td class="py-4 px-4 lg:py-5 lg:px-6 w-full max-w-[20ch] lg:max-w-none overflow-hidden">
+              {{ file.data.name }}
+            </td>
+            <td v-if="file.status !== 'Completed'" class="py-4 px-4 lg:py-5 lg:px-6">
+              <div class="flex flex-row items-center">
+                <span class="leading-none">{{ file.status }}</span><Loader2 v-if="file.status !== 'Completed'" class="w-4 h-4 -mt-1 ml-2 animate-spin" />
+              </div>
+            </td>
+            <td v-if="file.data.type.includes('image')" class="flex w-full flex-row items-center justify-between space-x-4 py-4 px-2 lg:py-5 lg:px-6 w-full">
+              <span>
+                {{ file.result }}
+              </span>
+              <button v-if="file.result" aria-label="Copy alt text" @click.prevent="addToClipboard(file.result)">
+                <Copy class="w-6 h-6 ml-8" />
+              </button>
+            </td>
+            <td v-else class="py-4 px-4 lg:py-5 lg:px-6 text-right">
+              <a :class="['inline-block', { 'opacity-50 pointer-events-none': !file.result }]" :href="file.result" target="_blank" download>
+                <Download class="w-6 h-6" />
+              </a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </section>
   </div>
 </template>
@@ -57,14 +49,10 @@ import { ref } from 'vue';
 import { useToast } from '@/components/ui/toast/use-toast';
 
 // Component Imports
-import { Loader2, Copy } from 'lucide-vue-next';
+import { Loader2, Copy, Download } from 'lucide-vue-next';
 
 // Props
 const props = defineProps({
-  mediaType: {
-    type: String,
-    required: true
-  },
   loadingMessage: {
     type: String,
     required: false,
@@ -75,49 +63,40 @@ const props = defineProps({
 // Error Handling
 const error = ref();
 
-// Drag and Drop
-const dropAreaRef = ref(null);
+// File Parsing Form
+const formRef = ref(null);
 const generating = ref(false);
 const files = ref([]);
-const completedFiles = computed(() => files.value.filter((file) => file.result).length);
 
 const resetGenerator = (e) => {
+  console.log('resetting');
+  
+  formRef.value.reset();
   generating.value = false;
-  files.value = [];
   error.value = undefined;
 }
 
-const handleDrag = (e) => {
-  dropAreaRef.value.classList.remove('bg-white/5');
-  dropAreaRef.value.classList.add('bg-white/15');
-}
-
-const handleDragExit = (e) => {
-  dropAreaRef.value.classList.remove('bg-white/15');
-  dropAreaRef.value.classList.add('bg-white/5');
-}
-
-const handleDrop = async (e) => {
-  handleDragExit()
+const parseFiles = async (e) => {
   try {
-    if (e.dataTransfer.items) {
-      generating.value = true;
-      files.value = [...e.dataTransfer.items].filter((item) => item.kind === 'file' && item.type.includes(props.mediaType)).map((item) => ({ data: item.getAsFile(), result: null, status: 'Queued' }));
+    const formData = new FormData(formRef.value);
+    files.value = [...formData.getAll('media')].map((file) => ({ data: file, result: null, status: 'Queued' }));
+    
+    generating.value = true;
+    
+    for (const file of files.value) {
+      const form = new FormData()
+      form.append('media', file.data);
+      file.status = 'Parsing';
       
-      for (const file of files.value) {
-        const form = new FormData()
-        form.append('media', file.data);
-        file.status = 'Parsing';
-        
-        if (file.data.type.includes('image')) file.result = await $fetch('/api/images/getAltText', { method: 'POST', body: form });
-        if (file.data.type.includes('video')) file.result = await $fetch('/api/video/getCaptions', { method: 'POST', body: form });
-        if (file.data.type.includes('audio')) file.result = await $fetch('/api/audio/getTranscript', { method: 'POST', body: form });
-        file.status = 'Completed';
-      }
+      if (file.data.type.includes('image')) file.result = await $fetch('/api/images/getAltText', { method: 'POST', body: form });
+      if (file.data.type.includes('video')) file.result = await $fetch('/api/video/getCaptions', { method: 'POST', body: form });
+      if (file.data.type.includes('audio')) file.result = await $fetch('/api/audio/getTranscript', { method: 'POST', body: form });
+      file.status = 'Completed';
     }
   } catch (err) {
     error.value = err.statusMessage;
-
+    files.value = [];
+  } finally {
     setTimeout(resetGenerator, 5000);
   }
 }

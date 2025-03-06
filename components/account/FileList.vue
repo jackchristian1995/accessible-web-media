@@ -1,24 +1,25 @@
 <template>
-  <div>
-    <section>
-      <h2>Transcripts</h2>
+  <section>
+    <h2>Your files</h2>
+    <div>
+      <h3>Transcripts</h3>
       <ul>
         <li v-for="transcript of transcripts" :key="transcript.id">
           {{ transcript.name }}
           <button class="cta" @click.prevent="downloadTranscript(caption.name)">Download</button>
         </li>
       </ul>
-    </section>
-    <section>
-      <h2>Captions</h2>
+    </div>
+    <div>
+      <h3>Captions</h3>
       <ul>
         <li v-for="caption of captions" :key="caption.id">
           {{ caption.name }}
           <button class="cta" @click.prevent="downloadCaptions(caption.name)">Download</button>
         </li>
       </ul>
-    </section>
-  </div>
+    </div>
+  </section>
 </template>
 
 <script setup>

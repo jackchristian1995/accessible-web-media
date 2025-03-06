@@ -7,10 +7,8 @@ export default defineEventHandler(async (event) => {
   if (body.length > 1) throw createError({ statusMessage: 'Only one file can be parsed at a time.' });
 
   const authToken = getCookie(event, 'auth_token');
-  console.log(authToken);
-  
   const { data: { user }, error: authError } = await supabase.auth.getUser(authToken);
-  if (authError) throw createError({ statusMessage: authError.message, statusCode: 401 });
+  if (authError) throw createError({ statusMessage: 'Sign up to gain access to video captions.', statusCode: 401 });
 
   const video = body.get('media');
   const arrayBuffer = await video.arrayBuffer();

@@ -95,7 +95,7 @@
   }
 
   html, body, #__nuxt {
-    @apply w-full h-full p-0 font-anderson tracking-wide;
+    @apply w-full p-0 font-anderson tracking-wide;
   }
 
   body {
@@ -103,25 +103,25 @@
   }
 
   /* Text Styles */
-  h1 {
-    @apply text-8xl font-light;
+  h1, h2 {
+    @apply text-2xl lg:text-4xl font-light;
   }
 
   h2 {
-    @apply text-4xl font-bold;
+    @apply text-2xl lg:text-4xl font-bold;
   }
 
   h3 {
-    @apply text-lg mb-8 font-bold uppercase;
+    @apply text-base lg:text-lg mb-8 font-bold uppercase;
   }
 
   p {
-    @apply text-lg font-light mb-5;
+    @apply text-base lg:text-lg font-normal mb-5;
   }
 
   /* Class Styles */
   .cta {
-    @apply text-lg font-bold leading-none px-6 pt-2 pb-1 border-2 border-white bg-white/5 rounded-lg transition-all;
+    @apply text-base lg:text-lg font-bold leading-none px-4 lg:px-6 py-2 border-2 border-white bg-white/5 rounded-lg transition-all;
     @apply hover:bg-white/10;
     @apply focus:bg-white/10;
   }

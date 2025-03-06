@@ -10,6 +10,7 @@ export default defineNuxtConfig({
     replicateToken: '',
     deepgramKey: '',
     supabaseUrl: '',
-    supabaseKey: ''
+    supabaseKey: '',
+    supabaseServiceKey: ''
   }
 });
