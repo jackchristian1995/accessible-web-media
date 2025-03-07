@@ -1,13 +1,12 @@
 <template>
   <div>
     <section>
-      <form ref="formRef" class="lg:w-2/3">
+      <form ref="formRef">
         <h2 class="mb-4">Upload your files</h2>
         <label for="media">
           <p class="mb-4">Upload images, video and audio, then watch our generator create all the alternative media you need for your website.</p>
-          <p v-if="!user" class="mb-4 font-bold">You must sign up to gain access to video captions and audio transcription.</p>
-          <p v-if="generating">Be patient. If you're uploading a large video or audio file, it can take a few minutes to complete. Just remember, it's cheaper and quikcer than human doing it.</p>
-          <input class="border-b-2 border-white w-full mt-8" id="media" type="file" accept="image/jpeg, image/png, image/webp, image/gif, video/*, audio/*" name="media" :disabled="generating" :multiple="user" @change.prevent="parseFiles" />
+          <p>Be patient. If you're uploading a large video or audio file, it can take a few minutes to complete. Just remember, it's cheaper and quicker than human doing it.</p>
+          <input class="border-b-2 border-white w-full lg:w-1/2 mt-8" id="media" type="file" accept="image/jpeg, image/png, image/webp, image/gif, video/*, audio/*" name="media" :disabled="generating" :multiple="user" @change.prevent="parseFiles" />
         </label>
         <p v-if="error" class="font-bold text-red-500 py-4 text-left">
           ERROR: {{ error }}
@@ -52,14 +51,6 @@ import { useToast } from '@/components/ui/toast/use-toast';
 // Component Imports
 import { Loader2, Copy, Download } from 'lucide-vue-next';
 
-// Props
-const props = defineProps({
-  user: {
-    type: [Object, undefined],
-    required: true
-  }
-});
-
 // User
 const user = inject('user');
 
@@ -72,21 +63,55 @@ const generating = ref(false);
 const files = ref([]);
 
 const resetGenerator = (e) => {
-  console.log('resetting');
-  
   formRef.value.reset();
   generating.value = false;
   error.value = undefined;
 }
 
+// Usage
+const checkUsage = async (fileType) => {
+  if (!user.value) {
+    const usage = localStorage.getItem('awm_anon_usage');
+    if (usage) {
+      const { date, count } = JSON.parse(usage);
+      if (new Date(Date.now()).getMonth() === new Date(date).getMonth() && count >= 5) throw new Error('Sign up for access to more than 5 generations per month.');
+    }
+  } else {
+    const usage = await $fetch('/api/user/getUsage');
+    if (!usage.length) return;
+
+    await $fetch('/api/user/checkUsage', { method: 'POST', body: { usage: usage[0], fileType } });
+    return;
+  }
+}
+
+const updateUsage = async (fileType) => {
+  if (!user.value) {
+    const usage = localStorage.getItem('awm_anon_usage');
+    if (usage) {
+      const { count } = JSON.parse(usage);
+      localStorage.setItem('awm_anon_usage', JSON.stringify({ date: Date.now(), count: count + 1 }));
+    } else {
+      localStorage.setItem('awm_anon_usage', JSON.stringify({ date: Date.now(), count: 1 }));
+    }
+  } else {
+    await $fetch('/api/user/updateUsage', { method: 'POST', body: { fileType: fileType } });
+  }
+}
+
 const parseFiles = async (e) => {
   try {
+    if (user.value) await $fetch('/api/auth/verify');
+
     const formData = new FormData(formRef.value);
     files.value = [...formData.getAll('media')].map((file) => ({ data: file, result: null, status: 'Queued' }));
     
     generating.value = true;
     
     for (const file of files.value) {
+      // Check if user is signed in and whether they have hit their usage limit
+      await checkUsage(file.data.type);
+      
       const form = new FormData()
       form.append('media', file.data);
       file.status = 'Parsing';
@@ -94,10 +119,12 @@ const parseFiles = async (e) => {
       if (file.data.type.includes('image')) file.result = await $fetch('/api/images/getAltText', { method: 'POST', body: form });
       if (file.data.type.includes('video')) file.result = await $fetch('/api/video/getCaptions', { method: 'POST', body: form });
       if (file.data.type.includes('audio')) file.result = await $fetch('/api/audio/getTranscript', { method: 'POST', body: form });
+      await updateUsage(file.data.type);
+
       file.status = 'Completed';
     }
   } catch (err) {
-    error.value = err.statusMessage;
+    error.value = err.statusMessage || err.message;
     files.value = [];
   } finally {
     setTimeout(resetGenerator, 5000);
