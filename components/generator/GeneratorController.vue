@@ -80,7 +80,7 @@ const checkUsage = async (fileType) => {
     const usage = await $fetch('/api/user/getUsage');
     if (!usage.length) return;
 
-    await $fetch('/api/user/checkUsage', { method: 'POST', body: { usage: usage[0], fileType } });
+    await $fetch('/api/user/checkUsage', { method: 'POST', body: { usage: usage[0], fileType, user: user.value.id } });
     return;
   }
 }

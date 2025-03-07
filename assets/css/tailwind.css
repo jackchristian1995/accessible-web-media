@@ -122,7 +122,7 @@
 
   /* Class Styles */
   .cta {
-    @apply text-base lg:text-lg font-bold leading-none px-4 lg:px-6 py-2 border-2 border-white bg-white/5 rounded-lg transition-all;
+    @apply text-base lg:text-lg font-bold leading-none px-4 py-2 border-2 border-white bg-white/5 transition-all;
     @apply hover:bg-white/10;
     @apply focus:bg-white/10;
   }
