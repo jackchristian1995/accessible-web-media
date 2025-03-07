@@ -3,7 +3,7 @@ import { useAuthStore } from "~/stores/AuthStore";
 export default defineNuxtRouteMiddleware(async (to, from) => {
   if (import.meta.server) return
   // Allow access to the login route without checks
-  if (to.path === '/login') return;
+  if (to.path === '/') return;
 
   const { $pinia } = useNuxtApp();
   const AuthStore = useAuthStore($pinia);
@@ -16,5 +16,6 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
   } catch (error) {
     // If verification fails, redirect to the login page
     AuthStore.setUser(undefined);
+    return useRouter().push('/');
   }
 });

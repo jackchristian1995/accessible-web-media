@@ -7,6 +7,7 @@
         </nuxt-link>
         <div class="flex flex-row items-center justify-end space-x-8">
           <nuxt-link to="/account">Downloads</nuxt-link>
+          <nuxt-link to="/feedback">Feedback</nuxt-link>
           <Dialog v-if="!user">
             <DialogTrigger>
               Sign in
