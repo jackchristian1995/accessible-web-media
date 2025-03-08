@@ -1,6 +1,6 @@
 <template>
   <div>
-    <section class="pb-8 mb-8 border-b-2 border-white">
+    <section class="pb-16 mb-16 border-b-2 border-white">
       <h1 class="mb-4">Your feedback</h1>
       <p>We are constantly looking to improve Accessible Web Media. With your help we can identify pain points and things to improve so that we can make it the best accessibility tool in the world.</p>
       <p class="mb-0">Complete the form below to give feedback and help grow Accessible Web Media.</p>
@@ -73,7 +73,7 @@
         </label>
       </fieldset>
       <input type="hidden" name="user" :value="user.id" />
-      <button type="submit" class="cta">Send</button>
+      <button type="submit" class="cta">Send Feedback</button>
     </form>
   </div>
 </template>
