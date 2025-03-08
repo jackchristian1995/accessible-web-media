@@ -4,7 +4,7 @@
       <h2 class="mb-4">Upload your files</h2>
       <label for="media">
         <p class="mb-4">Upload images, video and audio, then watch our generator create all the alternative media you need for your website.</p>
-        <p>Be patient. If you're uploading a large video or audio file, it can take a few minutes to complete. Just remember, it's cheaper and quicker than human doing it.</p>
+        <p>Be patient. If you're uploading a large video or audio file, it can take a few minutes to complete. Just remember, it's quicker than a human doing it.</p>
         <input class="border-b-2 border-white w-full lg:w-1/2 mt-8" id="media" type="file" accept="image/jpeg, image/png, image/webp, image/gif, video/*, audio/*" name="media" :disabled="generating" :multiple="user" @change.prevent="parseFiles" />
       </label>
       <p v-if="error" class="font-bold text-red-500 py-4 text-left">
