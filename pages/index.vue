@@ -12,7 +12,7 @@
     <section class="w-full pb-16 mb-16 border-b-2 border-white">
       <h2 class="mb-8">Usage Limits</h2>
       <p>For now, Accessible Web Media is a free tool. It is independently built and funded by <a class="underline" href="https://jackchristian.com.au/" target="_blank">Jack Christian</a>.</p>
-      <p>With this in mind, users are limited to 10 alt generations and 1 video captions or audio transcription job per month.</p>
+      <p>With this in mind, users are limited to 10 image alt text generations and 1 video captions or audio transcription job per month.</p>
       <p class="uppercase px-2 py-4 border-2 border-white inline-block"><strong>You can permanently extend your usage limit to 50 alt text and 10 video/audio jobs per month by completing our <nuxt-link class="underline" to="/feedback">feedback form</nuxt-link>.</strong></p>
     </section>
     <generator-controller class="w-full" />

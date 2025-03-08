@@ -14,7 +14,7 @@
     <table v-if="files.length" class="w-full mx-auto my-8 bg-white/5 rounded-2xl overflow-hidden border-collapse text-base lg:text-lg">
       <tbody>
         <tr v-for="file of files" :key="file.data.filename" :class="{ 'border-b-2 border-white': files.length > 1 }">
-          <td class="py-4 px-4 lg:py-5 lg:px-6 w-full max-w-[20ch] lg:max-w-none overflow-hidden">
+          <td class="py-4 px-4 lg:py-5 lg:px-6 w-auto max-w-[20ch] lg:max-w-none overflow-hidden">
             {{ file.data.name }}
           </td>
           <td v-if="file.status !== 'Completed'" class="py-4 px-4 lg:py-5 lg:px-6">
@@ -114,9 +114,9 @@ const parseFiles = async (e) => {
       form.append('media', file.data);
       file.status = 'Parsing';
       
-      if (file.data.type.includes('image')) file.result = await $fetch('/api/images/getAltText', { method: 'POST', body: form });
-      if (file.data.type.includes('video')) file.result = await $fetch('/api/video/getCaptions', { method: 'POST', body: form });
-      if (file.data.type.includes('audio')) file.result = await $fetch('/api/audio/getTranscript', { method: 'POST', body: form });
+      if (file.data.type.includes('image')) file.result = await $fetch('/api/images/getAltText-background', { method: 'POST', body: form });
+      if (file.data.type.includes('video')) file.result = await $fetch('/api/video/getCaptions-background', { method: 'POST', body: form });
+      if (file.data.type.includes('audio')) file.result = await $fetch('/api/audio/getTranscript-background', { method: 'POST', body: form });
       await updateUsage(file.data.type);
 
       file.status = 'Completed';
