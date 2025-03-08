@@ -17,7 +17,7 @@
           <td class="py-4 px-4 lg:py-5 lg:px-6 w-auto max-w-[20ch] lg:max-w-none overflow-hidden">
             {{ file.data.name }}
           </td>
-          <td v-if="file.status !== 'Completed'" class="py-4 px-4 lg:py-5 lg:px-6">
+          <td class="py-4 px-4 lg:py-5 lg:px-6">
             <div class="flex flex-row items-center">
               <span class="leading-none">{{ file.status }}</span><Loader2 v-if="file.status !== 'Completed'" class="w-4 h-4 -mt-1 ml-2 animate-spin" />
             </div>
@@ -43,8 +43,9 @@
 
 <script setup>
 // Module Imports
-import { ref, inject } from 'vue';
+import { ref, inject, onMounted } from 'vue';
 import { useToast } from '@/components/ui/toast/use-toast';
+import { createClient } from '@supabase/supabase-js';
 
 // Component Imports
 import { Loader2, Copy, Download } from 'lucide-vue-next';
@@ -54,6 +55,13 @@ const user = inject('user');
 
 // Error Handling
 const error = ref();
+
+// Supabase
+const supabase = ref();
+onMounted(async () => {
+  const { supabaseUrl, supabaseKey } = await $fetch('/api/supbase/getPublicCreds');
+  supabase.value = createClient(supabaseUrl, supabaseKey);
+})
 
 // File Parsing Form
 const formRef = ref(null);
@@ -72,7 +80,7 @@ const checkUsage = async (fileType) => {
     const usage = localStorage.getItem('awm_anon_usage');
     if (usage) {
       const { date, count } = JSON.parse(usage);
-      if (new Date(Date.now()).getMonth() === new Date(date).getMonth() && count >= 5) throw new Error('Sign up for access to more than 5 generations per month.');
+      if (new Date(Date.now()).getMonth() === new Date(date).getMonth() && count >= 5000) throw new Error('Sign up for access to more than 5 generations per month.');
     }
   } else {
     const usage = await $fetch('/api/user/getUsage');
@@ -107,22 +115,61 @@ const parseFiles = async (e) => {
     generating.value = true;
     
     for (const file of files.value) {
+      if (!user.value && !file.data.type.includes('image')) throw new Error('Sign up for access to audio transcription and video captions.');
       // Check if user is signed in and whether they have hit their usage limit
       await checkUsage(file.data.type);
       
-      const form = new FormData()
+      const form = new FormData();
       form.append('media', file.data);
       file.status = 'Parsing';
       
-      if (file.data.type.includes('image')) file.result = await $fetch('/api/images/getAltText-background', { method: 'POST', body: form });
-      if (file.data.type.includes('video')) file.result = await $fetch('/api/video/getCaptions-background', { method: 'POST', body: form });
-      if (file.data.type.includes('audio')) file.result = await $fetch('/api/audio/getTranscript-background', { method: 'POST', body: form });
-      await updateUsage(file.data.type);
+      if (file.data.type.includes('image')) file.result = await $fetch('/api/images/getAltText', { method: 'POST', body: form });
+      if (file.data.type.includes('video')) {
+        await fetch('/.netlify/functions/generate-video-captions-background', { method: 'POST', body: form });
+        const newChannel = supabase.value
+          .channel('file-uploads')
+          .on(
+            'postgres_changes',
+            { event: 'INSERT', schema: 'public', table: 'file_uploads' },
+            async (payload) => {
+              const { file_path } = payload.new;
+              if (file_path.includes(user.value.id) && file_path.includes(file.data.name.split('.')[0])) {
+                file.result = await $fetch('/api/video/getDownloadUrl', { method: 'POST', body: {path: file_path } });
+                supabase.value.removeChannel(newChannel);
+                file.status = 'Completed';
+                await updateUsage(file.data.type);
+              }
+            }
+          )
+          .subscribe();
+      }
+      if (file.data.type.includes('audio')) {
+        await fetch('/.netlify/functions/generate-audio-transcript-background', { method: 'POST', body: form });
+        const newChannel = supabase.value
+          .channel('file-uploads')
+          .on(
+            'postgres_changes',
+            { event: 'INSERT', schema: 'public', table: 'file_uploads' },
+            async (payload) => {
+              const { file_path } = payload.new;
+              if (file_path.includes(user.value.id) && file_path.includes(file.data.name.split('.')[0])) {
+                file.result = await $fetch('/api/audio/getDownloadUrl', { method: 'POST', body: {path: file_path } });
+                supabase.value.removeChannel(newChannel);
+                file.status = 'Completed';
+                await updateUsage(file.data.type);
+              }
+            }
+          )
+          .subscribe();
+      }
 
-      file.status = 'Completed';
     }
   } catch (err) {
-    error.value = err.statusMessage || err.message;
+    if (err.statusMessage) {
+      error.value = err.statusMessage;
+    } else {
+      error.value = err.message;
+    }
     files.value = [];
   } finally {
     setTimeout(resetGenerator, 5000);

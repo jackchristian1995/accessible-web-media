@@ -7,7 +7,7 @@ export default defineEventHandler(async (event) => {
   if (error) throw createError({ statusMessage: error.message });
 
   const imageLimit = data.length ? 50 : 10;
-  const audioLimit = data.length ? 10 : 1;
+  const audioLimit = data.length ? 10 : 1000;
 
   if (fileType.includes('image') && image_usage >= imageLimit) throw createError({ statusMessage: 'Alt text generator usage exceeded.' });
   if (fileType.includes('video') && audio_usage >= audioLimit) throw createError({ statusMessage: 'Video captions generator usage exceeded.' });

@@ -3,7 +3,6 @@ import { useAuthStore } from "~/stores/AuthStore";
 export default defineNuxtRouteMiddleware(async (to, from) => {
   if (import.meta.server) return
   // Allow access to the login route without checks
-  if (to.path === '/') return;
 
   const { $pinia } = useNuxtApp();
   const AuthStore = useAuthStore($pinia);

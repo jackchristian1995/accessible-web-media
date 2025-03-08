@@ -25,3 +25,5 @@ logs
 
 
 *.xlsx
+# Local Netlify folder
+.netlify
