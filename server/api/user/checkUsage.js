@@ -9,9 +9,9 @@ export default defineEventHandler(async (event) => {
   const imageLimit = data.length ? 50 : 10;
   const audioLimit = data.length ? 10 : 1;
 
-  if (fileType.includes('image') && image_usage >= imageLimit) throw createError({ statusMessage: 'Alt text generator usage exceeded.' });
-  if (fileType.includes('video') && audio_usage >= audioLimit) throw createError({ statusMessage: 'Video captions generator usage exceeded.' });
-  if (fileType.includes('audio') && audio_usage >= audioLimit) throw createError({ statusMessage: 'Audio transcript generator usage exceeded.' });
+  if (fileType.includes('image') && image_usage >= imageLimit) throw createError({ statusCode: 400, statusMessage: 'Alt text generator usage exceeded.' });
+  if (fileType.includes('video') && audio_usage >= audioLimit) throw createError({ statusCode: 400, statusMessage: 'Video captions generator usage exceeded.' });
+  if (fileType.includes('audio') && audio_usage >= audioLimit) throw createError({ statusCode: 400, statusMessage: 'Audio transcript generator usage exceeded.' });
 
   return true
 });

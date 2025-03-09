@@ -171,10 +171,10 @@ const parseFiles = async (e) => {
 
     }
   } catch (err) {
-    if (err.statusMessage) {
-      error.value = err.statusMessage;
+    if (err.statusCode === 400) {
+      error.value = 'Usage exceeded.';
     } else {
-      error.value = err.message;
+      error.value = err.statusMessage;
     }
     files.value = [];
   } finally {
