@@ -45,6 +45,7 @@
       <nuxt-page />
     </div>
     <Toaster />
+    <consent-form />
   </div>
 </template>
 
@@ -55,6 +56,7 @@ import { provide } from 'vue';
 // Component Imports
 import Toaster from '~/components/ui/toast/Toaster.vue';
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogFooter, DialogTitle, DialogDescription, DialogClose } from '~/components/ui/dialog';
+import ConsentForm from './components/consent/ConsentForm.vue';
 
 // Login
 const signInWithGithub = async () => {
