@@ -5,7 +5,8 @@
       <label for="media">
         <p class="mb-4">Upload images, video and audio, then watch our generator create all the alternative media you need for your website.</p>
         <p>Be patient. If you're uploading a large video or audio file, it can take a few minutes to complete. Just remember, it's quicker than a human doing it.</p>
-        <input class="border-b-2 border-white w-full lg:w-1/2 mt-8" id="media" type="file" accept="image/jpeg, image/png, image/webp, image/gif, video/*, audio/*" name="media" :disabled="generating" :multiple="user" @change.prevent="parseFiles" />
+        <input v-if="user" class="border-b-2 border-white w-full lg:w-1/2 mt-8" id="media" type="file" accept="image/jpeg, image/png, image/webp, image/gif, video/*, audio/*" name="media" :disabled="generating" multiple @change.prevent="parseFiles" />
+        <input v-else class="border-b-2 border-white w-full lg:w-1/2 mt-8" id="media" type="file" accept="image/jpeg, image/png, image/webp, image/gif" name="media" :disabled="generating" @change.prevent="parseFiles" />
       </label>
       <p v-if="error" class="font-bold text-red-500 py-4 text-left">
         ERROR: {{ error }}
@@ -19,7 +20,7 @@
           </td>
           <td class="py-4 px-4 lg:py-5 lg:px-6">
             <div class="flex flex-row items-center">
-              <span class="leading-none">{{ file.status }}</span><Loader2 v-if="file.status !== 'Completed'" class="w-4 h-4 -mt-1 ml-2 animate-spin" />
+              <span class="leading-none">{{ file.status }}</span><Loader2 v-if="!file.result" class="w-4 h-4 -mt-1 ml-2 animate-spin" />
             </div>
           </td>
           <td v-if="file.data.type.includes('image')" class="flex w-full flex-row items-center justify-between space-x-4 py-4 px-2 lg:py-5 lg:px-6 w-full">
@@ -59,7 +60,7 @@ const error = ref();
 // Supabase
 const supabase = ref();
 onMounted(async () => {
-  const { supabaseUrl, supabaseKey } = await $fetch('/api/supbase/getPublicCreds');
+  const { supabaseUrl, supabaseKey } = await $fetch('/api/supabase/getPublicCreds');
   supabase.value = createClient(supabaseUrl, supabaseKey);
 })
 
@@ -123,7 +124,10 @@ const parseFiles = async (e) => {
       form.append('media', file.data);
       file.status = 'Parsing';
       
-      if (file.data.type.includes('image')) file.result = await $fetch('/api/images/getAltText', { method: 'POST', body: form });
+      if (file.data.type.includes('image')) {
+        file.result = await $fetch('/api/images/getAltText', { method: 'POST', body: form });
+        file.status = 'Completed'
+      }
       if (file.data.type.includes('video')) {
         await fetch('/.netlify/functions/generate-video-captions-background', { method: 'POST', body: form });
         const newChannel = supabase.value

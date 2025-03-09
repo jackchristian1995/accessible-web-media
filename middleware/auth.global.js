@@ -15,6 +15,5 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
   } catch (error) {
     // If verification fails, redirect to the login page
     AuthStore.setUser(undefined);
-    return useRouter().push('/');
   }
 });

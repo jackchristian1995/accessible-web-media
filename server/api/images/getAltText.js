@@ -7,11 +7,11 @@ export default defineEventHandler(async (event) => {
 
   const file = body[0];
   if (!file.type.includes('image/')) throw createError({ statusMessage: 'This API endpoint is only for images.' });
-
+  
   // Upload image to temporary storage
-  const { data: { path }, error: uploadError } = await supabase.storage.from('tmp').upload(`${Date.now()}-${file.filename}`, file.data, { contentType: file.type });
+  const { data: { path }, error: uploadError } = await supabase.storage.from('tmp').upload(`${Date.now()}-${file.filename}`, file.data, { contentType: file.type });  
   if (uploadError) throw createError({ statusMessage: uploadError.message });
-
+  
   // Retreive signed URL for AI to access the file
   const { data: { signedUrl }, error: urlError } = await supabase.storage.from('tmp').createSignedUrl(path, 60);
   if (urlError) throw createError({ statusMessage: urlError.message });
@@ -36,6 +36,8 @@ export default defineEventHandler(async (event) => {
     // Return alt text
     return output.replace('Caption: ', '');
   } catch (error) {
+    console.error(error.message);
+    
     throw createError({ statusMessage: error.message });
   }
 });

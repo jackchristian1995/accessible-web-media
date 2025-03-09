@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
   if (!refreshToken) throw createError({ statusCode: 401, statusMessage: 'User not logged in - no refresh token available' });
 
   const { data: { session, user }, error } = await supabase.auth.refreshSession({ refresh_token: refreshToken });
-  if (error) throw createError({ statusCode: error.code, statusMessage: error.statusMessage });
+  if (error) throw createError({ statusCode: error.code, statusMessage: error.statusMessage });  
   
   setCookie(event, 'auth_token', session.access_token, {
     httpOnly: true,
