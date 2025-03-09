@@ -83,7 +83,7 @@ const checkUsage = async (fileType) => {
     const usage = localStorage.getItem('awm_anon_usage');
     if (usage) {
       const { date, count } = JSON.parse(usage);
-      if (new Date(Date.now()).getMonth() === new Date(date).getMonth() && count >= 5) throw new Error('Sign up for access to more than 5 generations per month.');
+      if (new Date(Date.now()).getMonth() === new Date(date).getMonth() && count >= 5) throw { statusMessage: 'Sign up for access to more than 5 generations per month.' };
     }
   } else {
     const usage = await $fetch('/api/user/getUsage');
@@ -118,7 +118,7 @@ const parseFiles = async (e) => {
     generating.value = true;
     
     for (const file of files.value) {
-      if (!user.value && !file.data.type.includes('image')) throw new Error('Sign up for access to audio transcription and video captions.');
+      if (!user.value && !file.data.type.includes('image')) throw { statusMessage: 'Sign up for access to audio transcription and video captions.' };
       // Check if user is signed in and whether they have hit their usage limit
       await checkUsage(file.data.type);
       
@@ -128,6 +128,7 @@ const parseFiles = async (e) => {
       
       if (file.data.type.includes('image')) {
         file.result = await $fetch('/api/images/getAltText', { method: 'POST', body: form });
+        await updateUsage(file.data.type);
         file.status = 'Completed'
       }
       if (file.data.type.includes('video')) {
