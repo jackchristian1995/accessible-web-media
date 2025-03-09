@@ -44,7 +44,7 @@
 
 <script setup>
 // Module Imports
-import { ref, inject, onMounted } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useToast } from '@/components/ui/toast/use-toast';
 import { createClient } from '@supabase/supabase-js';
 
@@ -52,7 +52,9 @@ import { createClient } from '@supabase/supabase-js';
 import { Loader2, Copy, Download } from 'lucide-vue-next';
 
 // User
-const user = inject('user');
+import { useAuthStore } from '~/stores/AuthStore';
+const { getUser } = useAuthStore();
+const user = computed(() => getUser());
 
 // Error Handling
 const error = ref();

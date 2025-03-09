@@ -50,9 +50,6 @@
 </template>
 
 <script setup>
-// Module Imports
-import { provide } from 'vue';
-
 // Component Imports
 import Toaster from '~/components/ui/toast/Toaster.vue';
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogFooter, DialogTitle, DialogDescription, DialogClose } from '~/components/ui/dialog';
@@ -74,7 +71,6 @@ import { useAuthStore } from '~/stores/AuthStore';
 const { getUser, setUser } = useAuthStore();
 
 const user = computed(() => getUser());
-provide('user', user);
 
 const logout = async () => {
   try {
