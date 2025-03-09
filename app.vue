@@ -6,8 +6,8 @@
           <img src="/accessible-web-media-logo-small.svg" alt="Accessible Web Media logo" class="w-auto h-5 block" />
         </nuxt-link>
         <div class="flex flex-row items-center justify-end space-x-8">
-          <nuxt-link to="/account">Downloads</nuxt-link>
-          <nuxt-link to="/feedback">Feedback</nuxt-link>
+          <nuxt-link v-if="user" to="/account">Downloads</nuxt-link>
+          <nuxt-link v-if="user" to="/feedback">Feedback</nuxt-link>
           <Dialog v-if="!user">
             <DialogTrigger>
               Sign in
