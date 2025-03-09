@@ -4,7 +4,7 @@ export default defineNuxtConfig({
   devtools: { enabled: false },
   pages: true,
 
-  modules: ['@nuxtjs/tailwindcss', '@pinia/nuxt'],
+  modules: ['@nuxtjs/tailwindcss', '@pinia/nuxt', 'nuxt-gtag'],
 
   app: {
     head: {
@@ -16,6 +16,20 @@ export default defineNuxtConfig({
         lang: 'en'
       }
     }
+  },
+
+  gtag: {
+    id: 'G-JJMBDHZK6R',
+    initCommands: [
+      // Setup up consent mode
+      ['consent', 'default', {
+        ad_user_data: 'denied',
+        ad_personalization: 'denied',
+        ad_storage: 'denied',
+        analytics_storage: 'denied',
+        wait_for_update: 500,
+      }]
+    ]
   },
 
   runtimeConfig: {
