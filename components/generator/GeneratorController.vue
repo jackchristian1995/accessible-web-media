@@ -82,7 +82,7 @@ const checkUsage = async (fileType) => {
     const usage = localStorage.getItem('awm_anon_usage');
     if (usage) {
       const { date, count } = JSON.parse(usage);
-      if (new Date(Date.now()).getMonth() === new Date(date).getMonth() && count >= 10) throw { statusMessage: 'Sign up for access to more than 5 generations per month.' };
+      if (new Date(Date.now()).getMonth() === new Date(date).getMonth() && count >= 10) throw { statusMessage: 'Sign up for access to more than 10 generations per month.' };
     }
   } else {
     const usage = await $fetch('/api/user/getUsage');
